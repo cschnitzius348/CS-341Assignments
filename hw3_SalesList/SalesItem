@@ -1,0 +1,20 @@
+public class SalesItem {
+	private String item;
+	private double price;
+	private int quantity;
+	
+	public SalesItem(String itemName, double price, int quantity) {
+		item = itemName;
+		this.price = price;
+		this.quantity = quantity;
+	}
+	
+	public double getItemTotal() {
+		return quantity * price;
+	}
+	
+	public String toString() {
+		// "\t" is a tab
+		return item + "\t$" + String.format("%.2f", price) + "\t" + quantity;
+	}
+}
