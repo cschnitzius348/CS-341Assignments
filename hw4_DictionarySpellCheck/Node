@@ -1,0 +1,18 @@
+package sept20_BinarySearchTree;
+
+public class Node {
+	public String word;
+	public Node left;
+	public Node right;
+	
+	public Node(String str) {
+		this.word = str;
+		left = null;
+		right = null;
+	}
+	
+	//DISPLAY THE NODE
+	public String toString() {
+		return word;
+	}
+}
