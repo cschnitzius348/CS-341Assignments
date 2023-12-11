@@ -1,0 +1,117 @@
+package hw6_FileScan_CountandList;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Stack;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
+
+public class MyMain {
+	static int lineCount = 0;
+	static ArrayList<String> listValidLines = new ArrayList<String>();
+	static boolean withinComment;
+
+	public static void main(String[] args) {
+		withinComment = false;
+		
+		//PART 1: create input file + file scanner
+		File inputFile;
+		Scanner fileInputScan = null;
+
+		//PART 2: use try-catch for file processing
+		try {
+			//TASK 1: use JFileChooser to select input file
+			JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+			int returnValue = jfc.showOpenDialog(null);
+			if (returnValue == JFileChooser.APPROVE_OPTION) {
+				inputFile = jfc.getSelectedFile();
+
+				//TASK 2: open code file w scanner 
+				fileInputScan = new Scanner(inputFile);
+
+				//TASK 3: collect methods, classes, and strutures and store in ArrayList
+				ArrayList<String> listMCS = collectMCS(fileInputScan);
+
+				//TASK 4: display the MCSs
+				String MCSString = "";
+				for (int i = 0; i < listMCS.size(); i++) {
+					MCSString += listMCS.get(i) + "\n";
+				}
+				System.out.println(MCSString);
+				
+				//display line count + valid lines
+				System.out.println("Total lines: " + lineCount);
+				for (int i = 0; i < listValidLines.size(); i++) {
+					System.out.println(listValidLines.get(i));
+				}
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("Error - This file could not be found");
+		} finally {
+			if (fileInputScan != null)
+				fileInputScan.close();
+		}
+
+	}
+
+	public static ArrayList<String> collectMCS(Scanner scanner) {
+		//TASK 1: create stack for backtracking
+		Stack<String> stackMCS = new Stack<String>();
+		
+		//TASK 2: create arraylist to store resulting data
+		ArrayList<String> listMCS = new ArrayList<String>();
+		
+		//TASK 3: use loop to scan one line at a time and collect backtracking results
+		String codeLine = "";
+		String possibleMCS = "";
+		
+		while (scanner.hasNextLine()) {
+			//STEP 1: grab single line of code, trim()
+			codeLine = scanner.nextLine();
+			codeLine = codeLine.trim();
+			
+			//STEP 1.5: count + report all lines of code (ignore blank lines and comment lines)
+			if(validLine(codeLine)) {
+				lineCount++;
+				listValidLines.add(0, codeLine);
+			}
+			
+			//STEP 2: check if line is start of mcs
+			//if (isCode(codeLine) ) {
+				if (!codeLine.equals("{") && !codeLine.equals("}")) {
+					possibleMCS = codeLine;
+				} else if (codeLine.equals("{")) {
+					stackMCS.push(possibleMCS);
+				} else {
+					listMCS.add(0, stackMCS.pop());
+				}
+			//}
+		}
+		
+		//TASK 4: return final arraylist
+		return listMCS;
+	}
+	
+	private static boolean validLine(String currentLine) {
+		if (currentLine.length() == 0) {
+			return false;
+		} else {
+			if (currentLine.charAt(0) == '/') {
+				if (currentLine.charAt(1) == '*') {
+					withinComment = true;
+				}
+				return false;
+			} else if (withinComment == true) {
+				if (currentLine.charAt(0) == '*') {
+					withinComment = false;
+				}
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+}
